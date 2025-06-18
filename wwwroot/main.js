@@ -9,15 +9,12 @@ initViewer(document.getElementById('preview')).then(viewer => {
     window.addEventListener('message', (event) => {
         const { hlookat, vlookat, fov } = event.data || {};
         if (typeof hlookat === 'number' && typeof vlookat === 'number') {
-            // Get current target and camera distance
             const target = viewer.navigation.getTarget() || new THREE.Vector3(0, 0, 0);
             const radius = viewer.navigation.getEyeVector().length();
 
-            // Convert degrees to radians
-            const phi = (90 - vlookat) * Math.PI / 180; // polar angle
-            const theta = (hlookat + 180) * Math.PI / 180; // azimuthal angle
+            const phi = (90 - hlookat) * Math.PI / 180;
+            const theta = (vlookat + 180) * Math.PI / 180;
 
-            // Spherical to Cartesian
             const x = target.x + radius * Math.sin(phi) * Math.cos(theta);
             const y = target.y + radius * Math.cos(phi);
             const z = target.z + radius * Math.sin(phi) * Math.sin(theta);
@@ -27,6 +24,7 @@ initViewer(document.getElementById('preview')).then(viewer => {
 
             if (typeof fov === 'number') {
                 viewer.setFOV(fov);
+                viewer.impl.invalidate(true, true, true); // Force redraw
             }
         }
     });
